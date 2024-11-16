@@ -5,7 +5,7 @@ import streamlit as st
 def corregir_datos(datos):
     try:
         # Corrección de P/E Trailing
-        if datos.get('pe_trailing', "N/A") != "N/A":
+        if datos.get('pe_trailing') not in (None, "N/A"):
             datos['pe_trailing'] = float(datos['pe_trailing'])
             if datos['pe_trailing'] > 200:
                 datos['pe_trailing'] /= 100
@@ -13,7 +13,7 @@ def corregir_datos(datos):
             datos['pe_trailing'] = "N/A"
 
         # Corrección de P/E Forward
-        if datos.get('pe_forward', "N/A") != "N/A":
+        if datos.get('pe_forward') not in (None, "N/A"):
             datos['pe_forward'] = float(datos['pe_forward'])
             if datos['pe_forward'] > 200:
                 datos['pe_forward'] /= 100
@@ -21,16 +21,18 @@ def corregir_datos(datos):
             datos['pe_forward'] = "N/A"
 
         # Corrección de diferencia de precios
-        if datos.get('precio_actual', "N/A") != "N/A" and datos.get('precio_esperado', "N/A") != "N/A":
-            datos['precio_actual'] = float(datos['precio_actual'])
-            datos['precio_esperado'] = float(datos['precio_esperado'])
-            diferencia_absoluta = abs(datos['precio_actual'] - datos['precio_esperado'])
-            max_precio = max(datos['precio_actual'], datos['precio_esperado'])
+        if datos.get('precio_actual') not in (None, "N/A") and datos.get('precio_esperado') not in (None, "N/A"):
+            precio_actual = float(datos['precio_actual'])
+            precio_esperado = float(datos['precio_esperado'])
+            diferencia_absoluta = abs(precio_actual - precio_esperado)
+            max_precio = max(precio_actual, precio_esperado)
             if diferencia_absoluta > 2.5 * max_precio:
-                if datos['precio_actual'] == max_precio:
-                    datos['precio_actual'] /= 100
+                if precio_actual == max_precio:
+                    precio_actual /= 100
                 else:
-                    datos['precio_esperado'] /= 100
+                    precio_esperado /= 100
+            datos['precio_actual'] = precio_actual
+            datos['precio_esperado'] = precio_esperado
         else:
             datos['precio_actual'] = "N/A"
             datos['precio_esperado'] = "N/A"
