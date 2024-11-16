@@ -4,7 +4,7 @@ import streamlit as st
 # Funciones de cálculo
 def calcular_pe_trailing(pe_trailing):
     if pe_trailing == "N/A":
-        return "N/A"
+        return 0
     elif pe_trailing < 16:
         return 100
     elif pe_trailing <= 22.5:
@@ -14,7 +14,7 @@ def calcular_pe_trailing(pe_trailing):
 
 def calcular_analisis_pe_forward(pe_forward, pe_trailing):
     if pe_forward == "N/A" or pe_trailing == "N/A":
-        return "N/A"
+        return 0
     diferencia = pe_forward - pe_trailing
     if diferencia > 0:
         return 0
@@ -25,7 +25,7 @@ def calcular_analisis_pe_forward(pe_forward, pe_trailing):
 
 def calcular_pe_forward(pe_forward):
     if pe_forward == "N/A":
-        return "N/A"
+        return 0
     elif pe_forward < 16:
         return 100
     elif pe_forward <= 22.5:
@@ -35,7 +35,7 @@ def calcular_pe_forward(pe_forward):
 
 def calcular_margen_beneficio(margen_beneficio):
     if margen_beneficio == "N/A":
-        return "N/A"
+        return 0
     elif margen_beneficio <= 0.05:
         return 15
     elif margen_beneficio <= 0.1:
@@ -47,7 +47,7 @@ def calcular_margen_beneficio(margen_beneficio):
 
 def calcular_relacion_empresa_ebitda(relacion_ebitda):
     if relacion_ebitda == "N/A":
-        return "N/A"
+        return 0
     elif relacion_ebitda <= 10:
         return 100
     elif relacion_ebitda <= 15:
@@ -57,7 +57,7 @@ def calcular_relacion_empresa_ebitda(relacion_ebitda):
 
 def porcentaje_insiders(valor):
     if valor == "N/A":
-        return "N/A"
+        return 0
     elif valor <= 0.05:
         return 15
     elif valor <= 0.1:
@@ -69,7 +69,7 @@ def porcentaje_insiders(valor):
 
 def calcular_crecimiento_ganancias(crecimiento_ganancias):
     if crecimiento_ganancias == "N/A":
-        return "N/A"
+        return 0
     elif crecimiento_ganancias <= 0.05:
         return 15
     elif crecimiento_ganancias <= 0.15:
@@ -81,7 +81,7 @@ def calcular_crecimiento_ganancias(crecimiento_ganancias):
 
 def calcular_beta(beta):
     if beta == "N/A":
-        return "N/A"
+        return 0
     elif 0.8 <= beta <= 1.2:
         return 100
     elif 0 < beta <= 0.3:
@@ -109,7 +109,7 @@ def calcular_dividendos(dividendos):
 
 def calcular_cash_deuda(cash, deuda):
     if cash == "N/A" or deuda == "N/A" or deuda == 0:
-        return "N/A"
+        return 0
     ratio = (cash - deuda) / deuda
     if 0 <= ratio <= 1:
         return 80
@@ -120,11 +120,11 @@ def calcular_cash_deuda(cash, deuda):
     elif ratio < -0.5:
         return 10
     else:
-        return "N/A"
+        return 0
 
 def calcular_deuda_ebitda(deuda, ebitda):
     if deuda == "N/A" or ebitda == "N/A" or ebitda == 0:
-        return "N/A"
+        return 0
     ratio = deuda / ebitda
     if 0 <= ratio <= 2.5:
         return 100
@@ -135,11 +135,11 @@ def calcular_deuda_ebitda(deuda, ebitda):
     elif ratio > 10:
         return 0
     else:
-        return "N/A"
+        return 0
 
 def calcular_precio_esperado(precio_actual, precio_esperado):
     if precio_actual == "N/A" or precio_esperado == "N/A":
-        return "N/A"
+        return 0
     diferencia = (precio_esperado - precio_actual) / precio_actual
     if diferencia < 0:
         return 0
@@ -176,6 +176,11 @@ def obtener_datos(ticker_symbol):
     except Exception as e:
         return {"error": str(e)}
 
+# Cálculo ponderado
+def calcular_puntuacion_total(pesos, valores):
+    puntuacion = sum(p * v / 100 for p, v in zip(pesos, valores))
+    return puntuacion
+
 # Streamlit
 def main():
     st.title("Análisis de Acciones")
@@ -187,18 +192,26 @@ def main():
             st.error(f"Error al obtener datos: {datos['error']}")
         else:
             st.subheader("Puntuaciones Calculadas")
-            st.write(f"P/E Trailing: {calcular_pe_trailing(datos['pe_trailing'])}")
-            st.write(f"P/E Forward: {calcular_pe_forward(datos['pe_forward'])}")
-            st.write(f"Análisis PE Forward: {calcular_analisis_pe_forward(datos['pe_forward'], datos['pe_trailing'])}")
-            st.write(f"Margen de Beneficio: {calcular_margen_beneficio(datos['margen_beneficio'])}")
-            st.write(f"Relación Empresa/EBITDA: {calcular_relacion_empresa_ebitda(datos['relacion_ebitda'])}")
-            st.write(f"% Insiders: {porcentaje_insiders(datos['insiders'])}")
-            st.write(f"Crecimiento de Ganancias: {calcular_crecimiento_ganancias(datos['crecimiento_ganancias'])}")
-            st.write(f"Beta: {calcular_beta(datos['beta'])}")
-            st.write(f"Dividendos: {calcular_dividendos(datos['dividendos'])}")
-            st.write(f"Cash vs. Deuda: {calcular_cash_deuda(datos['cash'], datos['deuda'])}")
-            st.write(f"Deuda/EBITDA: {calcular_deuda_ebitda(datos['deuda'], datos['ebitda'])}")
-            st.write(f"Precio Esperado: {calcular_precio_esperado(datos['precio_actual'], datos['precio_esperado'])}")
+            
+            valores = [
+                calcular_pe_trailing(datos['pe_trailing']),
+                calcular_pe_forward(datos['pe_forward']),
+                calcular_analisis_pe_forward(datos['pe_forward'], datos['pe_trailing']),
+                calcular_margen_beneficio(datos['margen_beneficio']),
+                calcular_relacion_empresa_ebitda(datos['relacion_ebitda']),
+                porcentaje_insiders(datos['insiders']),
+                calcular_crecimiento_ganancias(datos['crecimiento_ganancias']),
+                calcular_beta(datos['beta']),
+                calcular_dividendos(datos['dividendos']),
+                calcular_cash_deuda(datos['cash'], datos['deuda']),
+                calcular_deuda_ebitda(datos['deuda'], datos['ebitda']),
+                calcular_precio_esperado(datos['precio_actual'], datos['precio_esperado']),
+            ]
+            
+            pesos = [8.33, 13.89, 4.17, 12.50, 9.72, 9.72, 9.72, 2.78, 1.39, 9.72, 4.17, 13.89]
+            
+            puntuacion_total = calcular_puntuacion_total(pesos, valores)
+            st.write(f"Puntuación Total (Ponderada): {puntuacion_total}")
 
 if __name__ == "__main__":
     main()
