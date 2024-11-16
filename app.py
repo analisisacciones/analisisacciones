@@ -13,7 +13,8 @@ def corregir_datos(valor):
 def corregir_precios(precio_actual, precio_esperado):
     if precio_actual == "N/A" or precio_esperado == "N/A":
         return precio_actual, precio_esperado
-    diferencia = abs(precio_esperado - precio_actual) / max(precio_actual, precio_esperado)
+    # Calcular la diferencia relativa entre los dos precios
+    diferencia = abs(precio_esperado - precio_actual) / min(precio_actual, precio_esperado)
     if diferencia > 2.5:  # Más del 250%
         if precio_actual > precio_esperado:
             precio_actual = round(precio_actual / 100, 2)
