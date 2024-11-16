@@ -191,7 +191,7 @@ def main():
         if "error" in datos:
             st.error(f"Error al obtener datos: {datos['error']}")
         else:
-            st.subheader("Indicadores y Puntuaciones")
+            st.subheader("Puntuaciones Calculadas")
             
             valores = [
                 calcular_pe_trailing(datos['pe_trailing']),
@@ -211,18 +211,16 @@ def main():
             pesos = [8.33, 13.89, 4.17, 12.50, 9.72, 9.72, 9.72, 2.78, 1.39, 9.72, 4.17, 13.89]
             
             puntuacion_total = calcular_puntuacion_total(pesos, valores)
-            st.write(f"Puntuación Total (Ponderada del 1 al 10): {puntuacion_total}")
-
-            # Mostrar valores calculados junto con los indicadores originales
-            indicadores = [
-                "P/E Trailing", "P/E Forward", "Análisis P/E Forward", "Margen de Beneficio",
-                "Relación Empresa/EBITDA", "Porcentaje Insiders", "Crecimiento de Ganancias",
-                "Beta", "Dividendos", "Cash/Deuda", "Deuda/EBITDA", "Precio Esperado"
-            ]
-
-            st.write("**Valores e Indicadores:**")
-            for i, indicador in enumerate(indicadores):
-                st.write(f"{indicador}: {datos.get(indicador.lower().replace(' ', '_'), 'N/A')} | Puntuación: {valores[i]}")
+            
+            # Mostrar la puntuación con color
+            if puntuacion_total < 6:
+                color = "red"
+            elif 6 <= puntuacion_total <= 7:
+                color = "orange"
+            else:
+                color = "green"
+            
+            st.markdown(f"<h2 style='color:{color};'>Puntuación Total: {puntuacion_total}</h2>", unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
