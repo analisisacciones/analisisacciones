@@ -25,8 +25,9 @@ def corregir_datos(datos):
             datos['precio_actual'] = float(datos['precio_actual'])
             datos['precio_esperado'] = float(datos['precio_esperado'])
             diferencia_absoluta = abs(datos['precio_actual'] - datos['precio_esperado'])
-            if diferencia_absoluta > 2.5 * max(datos['precio_actual'], datos['precio_esperado']):
-                if datos['precio_actual'] > datos['precio_esperado']:
+            max_precio = max(datos['precio_actual'], datos['precio_esperado'])
+            if diferencia_absoluta > 2.5 * max_precio:
+                if datos['precio_actual'] == max_precio:
                     datos['precio_actual'] /= 100
                 else:
                     datos['precio_esperado'] /= 100
