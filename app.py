@@ -1,13 +1,33 @@
 import yfinance as yf
 import streamlit as st
 
-# Funciones de cálculo con prevenciones
+# Función para corregir datos (P/E y P/E Forward)
+def corregir_datos(valor):
+    if valor == "N/A":
+        return valor
+    if valor > 200:  # Solo dividir si el valor es mayor a 200
+        return round(valor / 100, 2)
+    return round(valor, 2)
+
+# Función para corregir precio actual y esperado si la diferencia es mayor al 250%
+def corregir_precios(precio_actual, precio_esperado):
+    if precio_actual == "N/A" or precio_esperado == "N/A":
+        return precio_actual, precio_esperado, False
+    # Calcular la diferencia relativa entre los dos precios
+    diferencia = abs(precio_esperado - precio_actual) / min(precio_actual, precio_esperado)
+    if diferencia > 2.5:  # Más del 250%
+        if precio_actual > precio_esperado:
+            precio_actual = round(precio_actual / 100, 2)
+        else:
+            precio_esperado = round(precio_esperado / 100, 2)
+        return precio_actual, precio_esperado, True
+    return precio_actual, precio_esperado, False
+
+# Funciones de cálculo
 def calcular_pe_trailing(pe_trailing):
     if pe_trailing == "N/A":
         return 0
-    elif pe_trailing > 200:
-        pe_trailing /= 100  # Prevención para P/E Trailing > 200
-    if pe_trailing < 16:
+    elif pe_trailing < 16:
         return 100
     elif pe_trailing <= 22.5:
         return 60
@@ -17,8 +37,6 @@ def calcular_pe_trailing(pe_trailing):
 def calcular_analisis_pe_forward(pe_forward, pe_trailing):
     if pe_forward == "N/A" or pe_trailing == "N/A":
         return 0
-    if pe_forward > 200:
-        pe_forward /= 100  # Prevención para P/E Forward > 200
     diferencia = pe_forward - pe_trailing
     if diferencia > 0:
         return 0
@@ -30,8 +48,6 @@ def calcular_analisis_pe_forward(pe_forward, pe_trailing):
 def calcular_pe_forward(pe_forward):
     if pe_forward == "N/A":
         return 0
-    if pe_forward > 200:
-        pe_forward /= 100  # Prevención para P/E Forward > 200
     elif pe_forward < 16:
         return 100
     elif pe_forward <= 22.5:
@@ -146,8 +162,6 @@ def calcular_deuda_ebitda(deuda, ebitda):
 def calcular_precio_esperado(precio_actual, precio_esperado):
     if precio_actual == "N/A" or precio_esperado == "N/A":
         return 0
-    if precio_esperado > 250 * precio_actual:  # Prevención para precio > 250%
-        precio_esperado /= 100  # Corregir el precio
     diferencia = (precio_esperado - precio_actual) / precio_actual
     if diferencia < 0:
         return 0
@@ -165,21 +179,40 @@ def obtener_datos(ticker_symbol):
     try:
         ticker = yf.Ticker(ticker_symbol)
         data = ticker.info
+        # Obtener los valores de datos y corregir antes de tomar el cálculo
+        pe_trailing = corregir_datos(data.get('trailingPE', "N/A"))
+        pe_forward = corregir_datos(data.get('forwardPE', "N/A"))
+        margen_beneficio = data.get('profitMargins', "N/A")
+        relacion_ebitda = data.get('enterpriseToEbitda', "N/A")
+        insiders = data.get('heldPercentInsiders', "N/A")
+        cash = data.get('totalCash', "N/A")
+        deuda = data.get('totalDebt', "N/A")
+        ebitda = data.get('ebitda', "N/A")
+        crecimiento_ganancias = data.get('earningsQuarterlyGrowth', "N/A")
+        beta = data.get('beta', "N/A")
+        dividendos = data.get('dividendYield', "N/A")
+        precio_actual = data.get('currentPrice', "N/A")
+        precio_esperado = data.get('targetMeanPrice', "N/A")
+        
+        # Corregir los precios
+        precio_actual, precio_esperado, precio_corregido = corregir_precios(precio_actual, precio_esperado)
+        
         return {
             'nombre': data.get('shortName', 'N/A'),
-            'pe_trailing': data.get('trailingPE', 'N/A'),
-            'pe_forward': data.get('forwardPE', 'N/A'),
-            'margen_beneficio': data.get('profitMargins', 'N/A'),
-            'relacion_ebitda': data.get('enterpriseToEbitda', 'N/A'),
-            'insiders': data.get('heldPercentInsiders', 'N/A'),
-            'cash': data.get('totalCash', 'N/A'),
-            'deuda': data.get('totalDebt', 'N/A'),
-            'ebitda': data.get('ebitda', 'N/A'),
-            'crecimiento_ganancias': data.get('earningsQuarterlyGrowth', 'N/A'),
-            'beta': data.get('beta', 'N/A'),
-            'dividendos': data.get('dividendYield', 'N/A'),
-            'precio_actual': data.get('currentPrice', 'N/A'),
-            'precio_esperado': data.get('targetMeanPrice', 'N/A')
+            'pe_trailing': pe_trailing,
+            'pe_forward': pe_forward,
+            'margen_beneficio': margen_beneficio,
+            'relacion_ebitda': relacion_ebitda,
+            'insiders': insiders,
+            'cash': cash,
+            'deuda': deuda,
+            'ebitda': ebitda,
+            'crecimiento_ganancias': crecimiento_ganancias,
+            'beta': beta,
+            'dividendos': dividendos,
+            'precio_actual': precio_actual,
+            'precio_esperado': precio_esperado,
+            'precio_corregido': precio_corregido
         }
     except Exception as e:
         return {"error": str(e)}
@@ -201,15 +234,14 @@ def main():
         else:
             st.subheader("Datos Financieros")
             for key, value in datos.items():
-                if key != "error":
-                    st.write(f"**{key.replace('_', ' ').capitalize()}:** {value}")
-
-            st.subheader("Puntuaciones Calculadas")
-            
+                if key != 'error':
+                    st.write(f"{key}: {value}")
+                    
+            st.subheader("Cálculos de Puntuación")
             valores = [
                 calcular_pe_trailing(datos['pe_trailing']),
-                calcular_pe_forward(datos['pe_forward']),
                 calcular_analisis_pe_forward(datos['pe_forward'], datos['pe_trailing']),
+                calcular_pe_forward(datos['pe_forward']),
                 calcular_margen_beneficio(datos['margen_beneficio']),
                 calcular_relacion_empresa_ebitda(datos['relacion_ebitda']),
                 porcentaje_insiders(datos['insiders']),
@@ -218,12 +250,13 @@ def main():
                 calcular_dividendos(datos['dividendos']),
                 calcular_cash_deuda(datos['cash'], datos['deuda']),
                 calcular_deuda_ebitda(datos['deuda'], datos['ebitda']),
-                calcular_precio_esperado(datos['precio_actual'], datos['precio_esperado']),
+                calcular_precio_esperado(datos['precio_actual'], datos['precio_esperado'])
             ]
-            
-            pesos = [8.33, 13.89, 4.17, 12.50, 9.72, 9.72, 9.72, 2.78, 1.39, 9.72, 4.17, 13.89]
-            puntuacion_total = calcular_puntuacion_total(pesos, valores)
-            st.write(f"**Puntuación Total:** {puntuacion_total}")
+
+            pesos = [20, 15, 10, 10, 10, 5, 5, 5, 5, 5, 5, 5]
+
+            puntuacion = calcular_puntuacion_total(pesos, valores)
+            st.write(f"Puntuación total: {puntuacion}")
 
 if __name__ == "__main__":
     main()
