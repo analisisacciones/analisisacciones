@@ -176,10 +176,10 @@ def obtener_datos(ticker_symbol):
     except Exception as e:
         return {"error": str(e)}
 
-# Cálculo ponderado
+# Cálculo ponderado ajustado
 def calcular_puntuacion_total(pesos, valores):
     puntuacion = sum(p * v / 100 for p, v in zip(pesos, valores))
-    return puntuacion
+    return round(puntuacion / 10, 2)
 
 # Streamlit
 def main():
@@ -211,7 +211,7 @@ def main():
             pesos = [8.33, 13.89, 4.17, 12.50, 9.72, 9.72, 9.72, 2.78, 1.39, 9.72, 4.17, 13.89]
             
             puntuacion_total = calcular_puntuacion_total(pesos, valores)
-            st.write(f"Puntuación Total (Ponderada): {puntuacion_total}")
+            st.write(f"Puntuación Total (Ponderada del 1 al 10): {puntuacion_total}")
 
 if __name__ == "__main__":
     main()
