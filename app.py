@@ -31,8 +31,9 @@ def corregir_datos(datos):
                     precio_actual /= 100
                 else:
                     precio_esperado /= 100
-            datos['precio_actual'] = precio_actual
-            datos['precio_esperado'] = precio_esperado
+            # Actualización explícita de los datos corregidos
+            datos['precio_actual'] = round(precio_actual, 2)
+            datos['precio_esperado'] = round(precio_esperado, 2)
         else:
             datos['precio_actual'] = "N/A"
             datos['precio_esperado'] = "N/A"
@@ -87,7 +88,7 @@ def main():
         st.error(f"Error al obtener datos: {datos['error']}")
         return
 
-    st.subheader("Datos Financieros")
+    st.subheader("Datos Financieros (Corregidos si es necesario)")
     for key, value in datos.items():
         if key != "error":
             st.write(f"**{key.replace('_', ' ').capitalize()}:** {value}")
