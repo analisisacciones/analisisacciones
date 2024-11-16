@@ -253,7 +253,7 @@ def main():
                 calcular_precio_esperado(datos['precio_actual'], datos['precio_esperado'])
             ]
 
-             pesos = [8.33, 13.89, 4.17, 12.50, 9.72, 9.72, 9.72, 2.78, 1.39, 9.72, 4.17, 13.89]
+            pesos = [8.33, 13.89, 4.17, 12.50, 9.72, 9.72, 9.72, 2.78, 1.39, 9.72, 4.17, 13.89]
 
             puntuacion = calcular_puntuacion_total(pesos, valores)
             st.write(f"Puntuación total: {puntuacion}")
