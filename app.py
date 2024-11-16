@@ -3,9 +3,12 @@ import streamlit as st
 
 # Funciones de cálculo con prevenciones
 def calcular_pe_trailing(pe_trailing):
-    if pe_trailing == "N/A":
+    try:
+        pe_trailing = float(pe_trailing)
+    except (ValueError, TypeError):
         return 0
-    elif pe_trailing > 200:
+    
+    if pe_trailing > 200:
         pe_trailing /= 100  # Prevención para P/E Trailing > 200
     if pe_trailing < 16:
         return 100
@@ -15,8 +18,12 @@ def calcular_pe_trailing(pe_trailing):
         return 30
 
 def calcular_analisis_pe_forward(pe_forward, pe_trailing):
-    if pe_forward == "N/A" or pe_trailing == "N/A":
+    try:
+        pe_forward = float(pe_forward)
+        pe_trailing = float(pe_trailing)
+    except (ValueError, TypeError):
         return 0
+
     if pe_forward > 200:
         pe_forward /= 100  # Prevención para P/E Forward > 200
     diferencia = pe_forward - pe_trailing
@@ -28,10 +35,13 @@ def calcular_analisis_pe_forward(pe_forward, pe_trailing):
         return 100
 
 def calcular_pe_forward(pe_forward):
-    if pe_forward == "N/A":
+    try:
+        pe_forward = float(pe_forward)
+    except (ValueError, TypeError):
         return 0
+
     if pe_forward > 200:
-        pe_forward /= 100  # Prevención para P/E Forward > 200
+        pe_forward /= 100
     elif pe_forward < 16:
         return 100
     elif pe_forward <= 22.5:
@@ -40,9 +50,12 @@ def calcular_pe_forward(pe_forward):
         return 30
 
 def calcular_margen_beneficio(margen_beneficio):
-    if margen_beneficio == "N/A":
+    try:
+        margen_beneficio = float(margen_beneficio)
+    except (ValueError, TypeError):
         return 0
-    elif margen_beneficio <= 0.05:
+
+    if margen_beneficio <= 0.05:
         return 15
     elif margen_beneficio <= 0.1:
         return 40
@@ -52,9 +65,12 @@ def calcular_margen_beneficio(margen_beneficio):
         return 100
 
 def calcular_relacion_empresa_ebitda(relacion_ebitda):
-    if relacion_ebitda == "N/A":
+    try:
+        relacion_ebitda = float(relacion_ebitda)
+    except (ValueError, TypeError):
         return 0
-    elif relacion_ebitda <= 10:
+
+    if relacion_ebitda <= 10:
         return 100
     elif relacion_ebitda <= 15:
         return 70
@@ -62,9 +78,12 @@ def calcular_relacion_empresa_ebitda(relacion_ebitda):
         return 30
 
 def porcentaje_insiders(valor):
-    if valor == "N/A":
+    try:
+        valor = float(valor)
+    except (ValueError, TypeError):
         return 0
-    elif valor <= 0.05:
+
+    if valor <= 0.05:
         return 15
     elif valor <= 0.1:
         return 40
@@ -74,9 +93,12 @@ def porcentaje_insiders(valor):
         return 100
 
 def calcular_crecimiento_ganancias(crecimiento_ganancias):
-    if crecimiento_ganancias == "N/A":
+    try:
+        crecimiento_ganancias = float(crecimiento_ganancias)
+    except (ValueError, TypeError):
         return 0
-    elif crecimiento_ganancias <= 0.05:
+
+    if crecimiento_ganancias <= 0.05:
         return 15
     elif crecimiento_ganancias <= 0.15:
         return 60
@@ -86,9 +108,12 @@ def calcular_crecimiento_ganancias(crecimiento_ganancias):
         return 100
 
 def calcular_beta(beta):
-    if beta == "N/A":
+    try:
+        beta = float(beta)
+    except (ValueError, TypeError):
         return 0
-    elif 0.8 <= beta <= 1.2:
+
+    if 0.8 <= beta <= 1.2:
         return 100
     elif 0 < beta <= 0.3:
         return 20
@@ -104,9 +129,12 @@ def calcular_beta(beta):
         return 0
 
 def calcular_dividendos(dividendos):
-    if dividendos == "N/A":
+    try:
+        dividendos = float(dividendos)
+    except (ValueError, TypeError):
         return 0
-    elif 0 < dividendos <= 0.02:
+
+    if 0 < dividendos <= 0.02:
         return 75
     elif dividendos > 0.02:
         return 100
@@ -114,8 +142,15 @@ def calcular_dividendos(dividendos):
         return 0
 
 def calcular_cash_deuda(cash, deuda):
-    if cash == "N/A" or deuda == "N/A" or deuda == 0:
+    try:
+        cash = float(cash)
+        deuda = float(deuda)
+    except (ValueError, TypeError):
         return 0
+
+    if deuda == 0:
+        return 0
+
     ratio = (cash - deuda) / deuda
     if 0 <= ratio <= 1:
         return 80
@@ -129,8 +164,15 @@ def calcular_cash_deuda(cash, deuda):
         return 0
 
 def calcular_deuda_ebitda(deuda, ebitda):
-    if deuda == "N/A" or ebitda == "N/A" or ebitda == 0:
+    try:
+        deuda = float(deuda)
+        ebitda = float(ebitda)
+    except (ValueError, TypeError):
         return 0
+
+    if ebitda == 0:
+        return 0
+
     ratio = deuda / ebitda
     if 0 <= ratio <= 2.5:
         return 100
@@ -144,10 +186,15 @@ def calcular_deuda_ebitda(deuda, ebitda):
         return 0
 
 def calcular_precio_esperado(precio_actual, precio_esperado):
-    if precio_actual == "N/A" or precio_esperado == "N/A":
+    try:
+        precio_actual = float(precio_actual)
+        precio_esperado = float(precio_esperado)
+    except (ValueError, TypeError):
         return 0
-    if precio_esperado > 250 * precio_actual:  # Prevención para precio > 250%
-        precio_esperado /= 100  # Corregir el precio
+
+    if precio_esperado > 250 * precio_actual:
+        precio_esperado /= 100
+
     diferencia = (precio_esperado - precio_actual) / precio_actual
     if diferencia < 0:
         return 0
@@ -186,6 +233,7 @@ def obtener_datos(ticker_symbol):
 
 # Cálculo ponderado ajustado
 def calcular_puntuacion_total(pesos, valores):
+    valores = [v if isinstance(v, (int, float)) else 0 for v in valores]
     puntuacion = sum(p * v / 100 for p, v in zip(pesos, valores))
     return round(puntuacion / 10, 2)
 
@@ -194,36 +242,40 @@ def main():
     st.title("Análisis de Acciones")
     ticker_symbol = st.text_input("Introduce el símbolo de la acción:")
 
-    if ticker_symbol:
-        datos = obtener_datos(ticker_symbol)
-        if "error" in datos:
-            st.error(f"Error al obtener datos: {datos['error']}")
-        else:
-            st.subheader("Datos Financieros")
-            for key, value in datos.items():
-                if key != "error":
-                    st.write(f"**{key.replace('_', ' ').capitalize()}:** {value}")
+    if not ticker_symbol.strip():
+        st.warning("Por favor, introduce un símbolo de acción válido.")
+        return
 
-            st.subheader("Puntuaciones Calculadas")
-            
-            valores = [
-                calcular_pe_trailing(datos['pe_trailing']),
-                calcular_pe_forward(datos['pe_forward']),
-                calcular_analisis_pe_forward(datos['pe_forward'], datos['pe_trailing']),
-                calcular_margen_beneficio(datos['margen_beneficio']),
-                calcular_relacion_empresa_ebitda(datos['relacion_ebitda']),
-                porcentaje_insiders(datos['insiders']),
-                calcular_crecimiento_ganancias(datos['crecimiento_ganancias']),
-                calcular_beta(datos['beta']),
-                calcular_dividendos(datos['dividendos']),
-                calcular_cash_deuda(datos['cash'], datos['deuda']),
-                calcular_deuda_ebitda(datos['deuda'], datos['ebitda']),
-                calcular_precio_esperado(datos['precio_actual'], datos['precio_esperado']),
-            ]
-            
-            pesos = [8.33, 13.89, 4.17, 12.50, 9.72, 9.72, 9.72, 2.78, 1.39, 9.72, 4.17, 13.89]
-            puntuacion_total = calcular_puntuacion_total(pesos, valores)
-            st.write(f"**Puntuación Total:** {puntuacion_total}")
+    datos = obtener_datos(ticker_symbol)
+    if "error" in datos:
+        st.error(f"Error al obtener datos: {datos['error']}")
+        return
+
+    st.subheader("Datos Financieros")
+    for key, value in datos.items():
+        if key != "error":
+            st.write(f"**{key.replace('_', ' ').capitalize()}:** {value}")
+
+    st.subheader("Puntuaciones Calculadas")
+
+    valores = [
+        calcular_pe_trailing(datos['pe_trailing']),
+        calcular_pe_forward(datos['pe_forward']),
+        calcular_analisis_pe_forward(datos['pe_forward'], datos['pe_trailing']),
+        calcular_margen_beneficio(datos['margen_beneficio']),
+        calcular_relacion_empresa_ebitda(datos['relacion_ebitda']),
+        porcentaje_insiders(datos['insiders']),
+        calcular_crecimiento_ganancias(datos['crecimiento_ganancias']),
+        calcular_beta(datos['beta']),
+        calcular_dividendos(datos['dividendos']),
+        calcular_cash_deuda(datos['cash'], datos['deuda']),
+        calcular_deuda_ebitda(datos['deuda'], datos['ebitda']),
+        calcular_precio_esperado(datos['precio_actual'], datos['precio_esperado']),
+    ]
+
+    pesos = [8.33, 13.89, 4.17, 12.50, 9.72, 9.72, 9.72, 2.78, 1.39, 9.72, 4.17, 13.89]
+    puntuacion_total = calcular_puntuacion_total(pesos, valores)
+    st.write(f"**Puntuación Total:** {puntuacion_total}")
 
 if __name__ == "__main__":
     main()
