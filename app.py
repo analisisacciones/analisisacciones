@@ -191,7 +191,7 @@ def main():
         if "error" in datos:
             st.error(f"Error al obtener datos: {datos['error']}")
         else:
-            st.subheader("Puntuaciones Calculadas")
+            st.subheader("Indicadores y Puntuaciones")
             
             valores = [
                 calcular_pe_trailing(datos['pe_trailing']),
@@ -213,14 +213,16 @@ def main():
             puntuacion_total = calcular_puntuacion_total(pesos, valores)
             st.write(f"Puntuación Total (Ponderada del 1 al 10): {puntuacion_total}")
 
- # Mostrar valores calculados junto con los indicadores originales
+            # Mostrar valores calculados junto con los indicadores originales
             indicadores = [
                 "P/E Trailing", "P/E Forward", "Análisis P/E Forward", "Margen de Beneficio",
                 "Relación Empresa/EBITDA", "Porcentaje Insiders", "Crecimiento de Ganancias",
                 "Beta", "Dividendos", "Cash/Deuda", "Deuda/EBITDA", "Precio Esperado"
             ]
-            
-           
+
+            st.write("**Valores e Indicadores:**")
+            for i, indicador in enumerate(indicadores):
+                st.write(f"{indicador}: {datos.get(indicador.lower().replace(' ', '_'), 'N/A')} | Puntuación: {valores[i]}")
 
 if __name__ == "__main__":
     main()
