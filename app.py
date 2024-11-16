@@ -191,6 +191,11 @@ def main():
         if "error" in datos:
             st.error(f"Error al obtener datos: {datos['error']}")
         else:
+            st.subheader("Datos Financieros")
+            for key, value in datos.items():
+                if key != "error":
+                    st.write(f"**{key.replace('_', ' ').capitalize()}:** {value}")
+
             st.subheader("Puntuaciones Calculadas")
             
             valores = [
@@ -212,7 +217,6 @@ def main():
             
             puntuacion_total = calcular_puntuacion_total(pesos, valores)
             
-            # Mostrar la puntuación con color
             if puntuacion_total < 6:
                 color = "red"
             elif 6 <= puntuacion_total <= 7:
