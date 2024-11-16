@@ -5,7 +5,7 @@ import streamlit as st
 def corregir_datos(valor):
     if valor == "N/A":
         return valor
-    if valor > 200:
+    if valor > 200:  # Solo dividir si el valor es mayor a 200
         return round(valor / 100, 2)
     return round(valor, 2)
 
@@ -41,7 +41,7 @@ def calcular_pe_forward(pe_forward):
     else:
         return 30
 
-# [OTRAS FUNCIONES DE CÁLCULO OMITIDAS POR BREVIDAD...]
+# [OTRAS FUNCIONES DE CÁLCULO OMITIDAS POR BREVEDAD...]
 # Incluye todas las funciones de cálculo de tu código anterior.
 
 # Función para obtener los datos
