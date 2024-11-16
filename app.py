@@ -12,7 +12,7 @@ def corregir_datos(valor):
 # Función para corregir precio actual y esperado si la diferencia es mayor al 250%
 def corregir_precios(precio_actual, precio_esperado):
     if precio_actual == "N/A" or precio_esperado == "N/A":
-        return precio_actual, precio_esperado
+        return precio_actual, precio_esperado, False
     # Calcular la diferencia relativa entre los dos precios
     diferencia = abs(precio_esperado - precio_actual) / min(precio_actual, precio_esperado)
     if diferencia > 2.5:  # Más del 250%
@@ -20,7 +20,8 @@ def corregir_precios(precio_actual, precio_esperado):
             precio_actual = round(precio_actual / 100, 2)
         else:
             precio_esperado = round(precio_esperado / 100, 2)
-    return precio_actual, precio_esperado
+        return precio_actual, precio_esperado, True
+    return precio_actual, precio_esperado, False
 
 # Funciones de cálculo
 def calcular_pe_trailing(pe_trailing):
@@ -69,19 +70,18 @@ def obtener_datos(ticker_symbol):
         precio_esperado = data.get('targetMeanPrice', 'N/A')
 
         # Aplicar corrección a P/E y P/E forward
-        if pe_trailing != 'N/A':
-            pe_trailing = corregir_datos(pe_trailing)
-
-        if pe_forward != 'N/A':
-            pe_forward = corregir_datos(pe_forward)
+        pe_trailing_corregido = corregir_datos(pe_trailing) if pe_trailing != 'N/A' else pe_trailing
+        pe_forward_corregido = corregir_datos(pe_forward) if pe_forward != 'N/A' else pe_forward
 
         # Aplicar corrección a precios si hay más del 250% de diferencia
-        precio_actual, precio_esperado = corregir_precios(precio_actual, precio_esperado)
+        precio_actual, precio_esperado, corrijo_precios = corregir_precios(precio_actual, precio_esperado)
 
         return {
             'nombre': data.get('shortName', 'N/A'),
             'pe_trailing': pe_trailing,
             'pe_forward': pe_forward,
+            'pe_trailing_corregido': pe_trailing_corregido,
+            'pe_forward_corregido': pe_forward_corregido,
             'margen_beneficio': data.get('profitMargins', 'N/A'),
             'relacion_ebitda': data.get('enterpriseToEbitda', 'N/A'),
             'insiders': data.get('heldPercentInsiders', 'N/A'),
@@ -92,7 +92,8 @@ def obtener_datos(ticker_symbol):
             'beta': data.get('beta', 'N/A'),
             'dividendos': data.get('dividendYield', 'N/A'),
             'precio_actual': precio_actual,
-            'precio_esperado': precio_esperado
+            'precio_esperado': precio_esperado,
+            'corrijo_precios': corrijo_precios
         }
     except Exception as e:
         return {"error": str(e)}
@@ -118,10 +119,15 @@ def main():
                     st.write(f"**{key.replace('_', ' ').capitalize()}:** {value}")
 
             st.subheader("Puntuaciones Calculadas")
+            
+            # Usar los valores corregidos si es necesario
+            pe_trailing = datos['pe_trailing_corregido'] if datos['corrijo_precios'] else datos['pe_trailing']
+            pe_forward = datos['pe_forward_corregido'] if datos['corrijo_precios'] else datos['pe_forward']
+            
             valores = [
-                calcular_pe_trailing(datos['pe_trailing']),
-                calcular_pe_forward(datos['pe_forward']),
-                calcular_analisis_pe_forward(datos['pe_forward'], datos['pe_trailing']),
+                calcular_pe_trailing(pe_trailing),
+                calcular_pe_forward(pe_forward),
+                calcular_analisis_pe_forward(pe_forward, pe_trailing),
                 # Añade las demás funciones de cálculo aquí...
             ]
 
