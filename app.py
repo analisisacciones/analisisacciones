@@ -9,6 +9,18 @@ def corregir_datos(valor):
         return round(valor / 100, 2)
     return round(valor, 2)
 
+# Función para corregir precio actual y esperado si la diferencia es mayor al 250%
+def corregir_precios(precio_actual, precio_esperado):
+    if precio_actual == "N/A" or precio_esperado == "N/A":
+        return precio_actual, precio_esperado
+    diferencia = abs(precio_esperado - precio_actual) / max(precio_actual, precio_esperado)
+    if diferencia > 2.5:  # Más del 250%
+        if precio_actual > precio_esperado:
+            precio_actual = round(precio_actual / 100, 2)
+        else:
+            precio_esperado = round(precio_esperado / 100, 2)
+    return precio_actual, precio_esperado
+
 # Funciones de cálculo
 def calcular_pe_trailing(pe_trailing):
     if pe_trailing == "N/A":
@@ -52,6 +64,8 @@ def obtener_datos(ticker_symbol):
 
         pe_trailing = data.get('trailingPE', 'N/A')
         pe_forward = data.get('forwardPE', 'N/A')
+        precio_actual = data.get('currentPrice', 'N/A')
+        precio_esperado = data.get('targetMeanPrice', 'N/A')
 
         # Aplicar corrección a P/E y P/E forward
         if pe_trailing != 'N/A':
@@ -59,6 +73,9 @@ def obtener_datos(ticker_symbol):
 
         if pe_forward != 'N/A':
             pe_forward = corregir_datos(pe_forward)
+
+        # Aplicar corrección a precios si hay más del 250% de diferencia
+        precio_actual, precio_esperado = corregir_precios(precio_actual, precio_esperado)
 
         return {
             'nombre': data.get('shortName', 'N/A'),
@@ -73,8 +90,8 @@ def obtener_datos(ticker_symbol):
             'crecimiento_ganancias': data.get('earningsQuarterlyGrowth', 'N/A'),
             'beta': data.get('beta', 'N/A'),
             'dividendos': data.get('dividendYield', 'N/A'),
-            'precio_actual': data.get('currentPrice', 'N/A'),
-            'precio_esperado': data.get('targetMeanPrice', 'N/A')
+            'precio_actual': precio_actual,
+            'precio_esperado': precio_esperado
         }
     except Exception as e:
         return {"error": str(e)}
