@@ -1,7 +1,45 @@
 import yfinance as yf
 import streamlit as st
 
-# Funciones de cálculo con prevenciones
+# Función para corregir precios
+def corregir_precios(datos):
+    if datos.get('precio_actual') != "N/A" and datos.get('precio_esperado') != "N/A":
+        precio_actual = float(datos['precio_actual'])
+        precio_esperado = float(datos['precio_esperado'])
+        diferencia_absoluta = abs(precio_actual - precio_esperado)
+        if diferencia_absoluta > 2.5 * max(precio_actual, precio_esperado):
+            if precio_actual > precio_esperado:
+                datos['precio_actual'] = precio_actual / 100
+            else:
+                datos['precio_esperado'] = precio_esperado / 100
+    return datos
+
+# Función para obtener los datos
+def obtener_datos(ticker_symbol):
+    try:
+        ticker = yf.Ticker(ticker_symbol)
+        data = ticker.info
+        datos = {
+            'nombre': data.get('shortName', 'N/A'),
+            'pe_trailing': data.get('trailingPE', 'N/A'),
+            'pe_forward': data.get('forwardPE', 'N/A'),
+            'margen_beneficio': data.get('profitMargins', 'N/A'),
+            'relacion_ebitda': data.get('enterpriseToEbitda', 'N/A'),
+            'insiders': data.get('heldPercentInsiders', 'N/A'),
+            'cash': data.get('totalCash', 'N/A'),
+            'deuda': data.get('totalDebt', 'N/A'),
+            'ebitda': data.get('ebitda', 'N/A'),
+            'crecimiento_ganancias': data.get('earningsQuarterlyGrowth', 'N/A'),
+            'beta': data.get('beta', 'N/A'),
+            'dividendos': data.get('dividendYield', 'N/A'),
+            'precio_actual': data.get('currentPrice', 'N/A'),
+            'precio_esperado': data.get('targetMeanPrice', 'N/A')
+        }
+        return corregir_precios(datos)  # Corrige precios antes de retornarlos
+    except Exception as e:
+        return {"error": str(e)}
+
+# Funciones de cálculo
 def calcular_pe_trailing(pe_trailing):
     if pe_trailing == "N/A":
         return 0
@@ -146,8 +184,6 @@ def calcular_deuda_ebitda(deuda, ebitda):
 def calcular_precio_esperado(precio_actual, precio_esperado):
     if precio_actual == "N/A" or precio_esperado == "N/A":
         return 0
-    if precio_esperado > 250 * precio_actual:  # Prevención para precio > 250%
-        precio_esperado /= 100  # Corregir el precio
     diferencia = (precio_esperado - precio_actual) / precio_actual
     if diferencia < 0:
         return 0
@@ -159,30 +195,6 @@ def calcular_precio_esperado(precio_actual, precio_esperado):
         return 80
     else:
         return 100
-
-# Función para obtener los datos
-def obtener_datos(ticker_symbol):
-    try:
-        ticker = yf.Ticker(ticker_symbol)
-        data = ticker.info
-        return {
-            'nombre': data.get('shortName', 'N/A'),
-            'pe_trailing': data.get('trailingPE', 'N/A'),
-            'pe_forward': data.get('forwardPE', 'N/A'),
-            'margen_beneficio': data.get('profitMargins', 'N/A'),
-            'relacion_ebitda': data.get('enterpriseToEbitda', 'N/A'),
-            'insiders': data.get('heldPercentInsiders', 'N/A'),
-            'cash': data.get('totalCash', 'N/A'),
-            'deuda': data.get('totalDebt', 'N/A'),
-            'ebitda': data.get('ebitda', 'N/A'),
-            'crecimiento_ganancias': data.get('earningsQuarterlyGrowth', 'N/A'),
-            'beta': data.get('beta', 'N/A'),
-            'dividendos': data.get('dividendYield', 'N/A'),
-            'precio_actual': data.get('currentPrice', 'N/A'),
-            'precio_esperado': data.get('targetMeanPrice', 'N/A')
-        }
-    except Exception as e:
-        return {"error": str(e)}
 
 # Cálculo ponderado ajustado
 def calcular_puntuacion_total(pesos, valores):
@@ -199,7 +211,7 @@ def main():
         if "error" in datos:
             st.error(f"Error al obtener datos: {datos['error']}")
         else:
-            st.subheader("Datos Financieros")
+            st.subheader("Datos Financieros (Corregidos si es necesario)")
             for key, value in datos.items():
                 if key != "error":
                     st.write(f"**{key.replace('_', ' ').capitalize()}:** {value}")
