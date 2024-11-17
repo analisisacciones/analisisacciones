@@ -1,24 +1,7 @@
 import yfinance as yf
 import streamlit as st
 
-# Función para formatear números grandes
-def formatear_numero(numero):
-    if numero == "N/A" or numero is None:
-        return "N/A"
-    if abs(numero) >= 1e9:  # Billones
-        return f"{round(numero / 1e9, 2)}B"
-    elif abs(numero) >= 1e6:  # Millones
-        return f"{round(numero / 1e6, 2)}M"
-    else:
-        return f"{round(numero, 2)}"
-
-# Función para formatear porcentajes
-def formatear_porcentaje(valor):
-    if valor == "N/A" or valor is None:
-        return "N/A"
-    return f"{round(valor * 100, 2)}%"
-
-# Funciones para evaluar cada métrica
+# Funciones de cálculo para cada métrica
 def calcular_pe_trailing(pe_trailing):
     if pe_trailing == "N/A":
         return 0
@@ -169,7 +152,7 @@ def calcular_precio_esperado(precio_actual, precio_esperado):
     else:
         return 100
 
-# Función para obtener datos de yfinance
+# Función para obtener los datos de yfinance
 def obtener_datos(ticker_symbol):
     ticker = yf.Ticker(ticker_symbol)
     data = ticker.info
@@ -189,14 +172,18 @@ def obtener_datos(ticker_symbol):
         "Precio Esperado": data.get("targetMeanPrice", "N/A"),
     }
 
-# Función principal de Streamlit
+# Función para calcular la puntuación final
+def calcular_puntuacion(pesos, valores):
+    return round(sum(p * v / 100 for p, v in zip(pesos, valores)) / 10, 2)
+
+# Streamlit - Interfaz Principal
 def main():
     st.title("Análisis de Acciones")
     ticker_symbol = st.text_input("Introduce el símbolo de la acción:")
     if ticker_symbol:
         datos = obtener_datos(ticker_symbol)
 
-        # Calcular valores
+        # Cálculo de los valores
         valores = [
             calcular_pe_trailing(datos["P/E Trailing"]),
             calcular_pe_forward(datos["P/E Forward"]),
@@ -212,17 +199,17 @@ def main():
             calcular_precio_esperado(datos["Precio Actual"], datos["Precio Esperado"]),
         ]
 
-        # Pesos
+        # Pesos de cada métrica
         pesos = [8.96, 14.93, 4.48, 13.43, 10.45, 10.45, 10.45, 2.99, 1.49, 4.48, 10.45, 7.46]
 
-        # Puntuación final
-        puntuacion_total = round(sum(p * v / 100 for p, v in zip(pesos, valores)) / 10, 2)
+        # Puntuación Final
+        puntuacion_final = calcular_puntuacion(pesos, valores)
 
-        # Mostrar resultados
-        st.write(f"Puntuación Total: {puntuacion_total}")
-        st.write("Detalles:")
+        # Mostrar Resultados
+        st.write(f"**Puntuación Final:** {puntuacion_final}")
+        st.subheader("Datos Financieros:")
         for key, value in datos.items():
-            st.write(f"{key}: {value}")
+            st.write(f"**{key}:** {value}")
 
 if __name__ == "__main__":
     main()
