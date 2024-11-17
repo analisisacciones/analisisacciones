@@ -62,6 +62,20 @@ def obtener_datos(ticker_symbol):
     except Exception as e:
         return {"error": str(e)}
 
+# Función de cálculo ponderado ajustado
+def calcular_puntuacion_total(pesos, valores):
+    puntuacion = sum(p * v / 100 for p, v in zip(pesos, valores))
+    return round(puntuacion / 10, 2)
+
+# Función para mostrar puntuación con colores
+def mostrar_puntuacion(puntuacion_total):
+    if puntuacion_total < 6:
+        st.markdown(f"<h2 style='color:red;'>Puntuación de compra: {puntuacion_total}</h2>", unsafe_allow_html=True)
+    elif 6 <= puntuacion_total < 7:
+        st.markdown(f"<h2 style='color:orange;'>Puntuación de compra: {puntuacion_total}</h2>", unsafe_allow_html=True)
+    else:
+        st.markdown(f"<h2 style='color:green;'>Puntuación de compra: {puntuacion_total}</h2>", unsafe_allow_html=True)
+
 # Funciones de cálculo
 def calcular_pe_trailing(pe_trailing):
     if pe_trailing == "N/A":
@@ -198,11 +212,6 @@ def calcular_deuda_ebitda(deuda, ebitda):
     else:
         return 0
 
-# Cálculo ponderado ajustado
-def calcular_puntuacion_total(pesos, valores):
-    puntuacion = sum(p * v / 100 for p, v in zip(pesos, valores))
-    return round(puntuacion / 10, 2)
-
 # Streamlit
 def main():
     st.title("Análisis de Acciones")
@@ -213,12 +222,7 @@ def main():
         if "error" in datos:
             st.error(f"Error al obtener datos: {datos['error']}")
         else:
-            st.subheader("Datos Financieros")
-            for key, value in datos.items():
-                if key != "error":
-                    st.write(f"**{key.replace('_', ' ').capitalize()}:** {value}")
-
-            st.subheader("Puntuaciones Calculadas")
+            # Calcular la puntuación total
             valores = [
                 calcular_pe_trailing(datos['pe_trailing']),
                 calcular_pe_forward(datos['pe_forward']),
@@ -235,7 +239,15 @@ def main():
 
             pesos = [8.33, 13.89, 4.17, 12.50, 9.72, 9.72, 9.72, 2.78, 1.39, 9.72, 4.17, 13.89]
             puntuacion_total = calcular_puntuacion_total(pesos, valores)
-            st.write(f"**Puntuación Total:** {puntuacion_total}")
+
+            # Mostrar la puntuación de compra primero
+            mostrar_puntuacion(puntuacion_total)
+
+            # Mostrar los datos financieros
+            st.subheader("Datos Financieros")
+            for key, value in datos.items():
+                if key != "error":
+                    st.write(f"**{key.replace('_', ' ').capitalize()}:** {value}")
 
 if __name__ == "__main__":
     main()
