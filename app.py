@@ -254,7 +254,7 @@ def main():
                 calcular_deuda_ebitda(datos['deuda'], datos['ebitda']),
             ]
 
-            pesos = [8.33, 13.89, 4.17, 12.50, 9.72, 9.72, 9.72, 2.78, 1.39, 9.72, 4.17, 13.89]
+            pesos = [8.96, 14.93, 4.48, 13.43, 10.45, 10.45, 10.45, 2.99, 1.49, 10.45, 4.48, 7.46]
             puntuacion_total = calcular_puntuacion_total(pesos, valores)
 
             # Mostrar la puntuación de compra primero
