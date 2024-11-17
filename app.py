@@ -270,7 +270,7 @@ def main():
                 calcular_diferencia_precio(datos['precio_actual'], datos['precio_esperado'])
             ]
 
-            pesos = [8.96, 4.48, 14.93, 13.43, 10.45, 10.45, 10.45, 2.99, 1.49, 4.48, 7.46, 4.93]
+            pesos = [8.96, 4.48, 14.93, 13.43, 10.45, 10.45, 10.45, 2.99, 1.49, 4.48, 10.45, 7.46]
             puntuacion_total = calcular_puntuacion_total(pesos, valores)
 
             mostrar_puntuacion(puntuacion_total)
