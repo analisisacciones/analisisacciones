@@ -1,6 +1,23 @@
 import yfinance as yf
 import streamlit as st
 
+# Función para formatear números grandes
+def formatear_numero(numero):
+    if numero == "N/A" or numero is None:
+        return "N/A"
+    if abs(numero) >= 1e9:  # Billones
+        return f"{round(numero / 1e9, 2)}B"
+    elif abs(numero) >= 1e6:  # Millones
+        return f"{round(numero / 1e6, 2)}M"
+    else:
+        return f"{round(numero, 2)}"
+
+# Función para formatear porcentajes
+def formatear_porcentaje(valor):
+    if valor == "N/A" or valor is None:
+        return "N/A"
+    return f"{round(valor * 100, 2)}%"
+
 # Función para corregir datos
 def corregir_datos(valor):
     if valor == "N/A":
@@ -243,11 +260,27 @@ def main():
             # Mostrar la puntuación de compra primero
             mostrar_puntuacion(puntuacion_total)
 
-            # Mostrar los datos financieros
+            # Mostrar los datos financieros con formato
             st.subheader("Datos Financieros")
-            for key, value in datos.items():
-                if key != "error":
-                    st.write(f"**{key.replace('_', ' ').capitalize()}:** {value}")
+            datos_formateados = {
+                "Nombre": datos["nombre"],
+                "P/E Trailing": datos["pe_trailing"],
+                "P/E Forward": datos["pe_forward"],
+                "Margen de Beneficio": formatear_porcentaje(datos["margen_beneficio"]),
+                "Relación Empresa/EBITDA": datos["relacion_ebitda"],
+                "Insiders": formatear_porcentaje(datos["insiders"]),
+                "Cash": formatear_numero(datos["cash"]),
+                "Deuda": formatear_numero(datos["deuda"]),
+                "EBITDA": formatear_numero(datos["ebitda"]),
+                "Crecimiento de Ganancias": formatear_porcentaje(datos["crecimiento_ganancias"]),
+                "Beta": datos["beta"],
+                "Dividendos": formatear_porcentaje(datos["dividendos"]),
+                "Precio Actual": datos["precio_actual"],
+                "Precio Esperado": datos["precio_esperado"],
+            }
+
+            for key, value in datos_formateados.items():
+                st.write(f"**{key}:** {value}")
 
 if __name__ == "__main__":
     main()
