@@ -30,7 +30,6 @@ def corregir_datos(valor):
 def corregir_precios(precio_actual, precio_esperado):
     if precio_actual == "N/A" or precio_esperado == "N/A":
         return precio_actual, precio_esperado
-    # Calcular la diferencia relativa entre los dos precios
     diferencia = abs(precio_esperado - precio_actual) / min(precio_actual, precio_esperado)
     if diferencia > 2.5:  # Más del 250%
         if precio_actual > precio_esperado:
@@ -81,6 +80,8 @@ def obtener_datos(ticker_symbol):
 
 # Función de cálculo ponderado ajustado
 def calcular_puntuacion_total(pesos, valores):
+    if len(pesos) != len(valores):
+        raise ValueError("El número de valores y pesos no coincide")
     puntuacion = sum(p * v / 100 for p, v in zip(pesos, valores))
     return round(puntuacion / 10, 2)
 
@@ -232,7 +233,7 @@ def calcular_deuda_ebitda(deuda, ebitda):
 def calcular_diferencia_precio(precio_actual, precio_esperado):
     if precio_actual == "N/A" or precio_esperado == "N/A" or precio_esperado == 0:
         return 0
-    diferencia = (precio_esperado - precio_actual) / precio_actual  # Relación entre precios
+    diferencia = (precio_esperado - precio_actual) / precio_actual
     if diferencia < 0:
         return 0
     elif 0 <= diferencia < 0.1:
@@ -254,7 +255,6 @@ def main():
         if "error" in datos:
             st.error(f"Error al obtener datos: {datos['error']}")
         else:
-            # Calcular la puntuación total
             valores = [
                 calcular_pe_trailing(datos['pe_trailing']),
                 calcular_pe_forward(datos['pe_forward']),
@@ -267,15 +267,14 @@ def main():
                 calcular_dividendos(datos['dividendos']),
                 calcular_cash_deuda(datos['cash'], datos['deuda']),
                 calcular_deuda_ebitda(datos['deuda'], datos['ebitda']),
+                calcular_diferencia_precio(datos['precio_actual'], datos['precio_esperado'])
             ]
 
-            pesos = [8.96, 4.48, 14.93, 13.43, 10.45, 10.45, 10.45, 2.99, 1.49, 4.48, 10.45, 7.46]
+            pesos = [8.96, 4.48, 14.93, 13.43, 10.45, 10.45, 10.45, 2.99, 1.49, 4.48, 7.46, 4.93]
             puntuacion_total = calcular_puntuacion_total(pesos, valores)
 
-            # Mostrar la puntuación de compra primero
             mostrar_puntuacion(puntuacion_total)
 
-            # Mostrar los datos financieros con formato
             st.subheader("Datos Financieros")
             datos_formateados = {
                 "Nombre": datos["nombre"],
