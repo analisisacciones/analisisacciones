@@ -229,6 +229,21 @@ def calcular_deuda_ebitda(deuda, ebitda):
     else:
         return 0
 
+def calcular_diferencia_precio(precio_actual, precio_esperado):
+    if precio_actual == "N/A" or precio_esperado == "N/A" or precio_esperado == 0:
+        return 0
+    diferencia = (precio_esperado - precio_actual) / precio_actual  # Relación entre precios
+    if diferencia < 0:
+        return 0
+    elif 0 <= diferencia < 0.1:
+        return 30
+    elif 0.1 <= diferencia < 0.2:
+        return 60
+    elif 0.2 <= diferencia < 0.4:
+        return 80
+    else:
+        return 100
+
 # Streamlit
 def main():
     st.title("Análisis de Acciones")
@@ -254,7 +269,7 @@ def main():
                 calcular_deuda_ebitda(datos['deuda'], datos['ebitda']),
             ]
 
-            pesos = [8.96, 14.93, 4.48, 13.43, 10.45, 10.45, 10.45, 2.99, 1.49, 4.48, 10.45, 7.46]
+            pesos = [8.96, 4.48, 14.93, 13.43, 10.45, 10.45, 10.45, 2.99, 1.49, 4.48, 10.45, 7.46]
             puntuacion_total = calcular_puntuacion_total(pesos, valores)
 
             # Mostrar la puntuación de compra primero
