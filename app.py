@@ -1,7 +1,7 @@
 import yfinance as yf
 import streamlit as st
 
-# Funciones de cálculo para cada métrica
+# Funciones para calcular valores intermedios según las métricas
 def calcular_pe_trailing(pe_trailing):
     if pe_trailing == "N/A":
         return 0
@@ -152,7 +152,13 @@ def calcular_precio_esperado(precio_actual, precio_esperado):
     else:
         return 100
 
-# Función para obtener los datos de yfinance
+# Función para calcular la puntuación total con redondeos intermedios
+def calcular_puntuacion_total(pesos, valores):
+    resultados_parciales = [round(p * v / 100, 2) for p, v in zip(pesos, valores)]  # Redondeo intermedio
+    suma_ponderada = sum(resultados_parciales)
+    return round(suma_ponderada / 10, 2)
+
+# Función para obtener datos de yfinance
 def obtener_datos(ticker_symbol):
     ticker = yf.Ticker(ticker_symbol)
     data = ticker.info
@@ -172,18 +178,14 @@ def obtener_datos(ticker_symbol):
         "Precio Esperado": data.get("targetMeanPrice", "N/A"),
     }
 
-# Función para calcular la puntuación final
-def calcular_puntuacion(pesos, valores):
-    return round(sum(p * v / 100 for p, v in zip(pesos, valores)) / 10, 2)
-
-# Streamlit - Interfaz Principal
+# Streamlit - Interfaz principal
 def main():
     st.title("Análisis de Acciones")
     ticker_symbol = st.text_input("Introduce el símbolo de la acción:")
     if ticker_symbol:
         datos = obtener_datos(ticker_symbol)
 
-        # Cálculo de los valores
+        # Calcular valores
         valores = [
             calcular_pe_trailing(datos["P/E Trailing"]),
             calcular_pe_forward(datos["P/E Forward"]),
@@ -199,13 +201,13 @@ def main():
             calcular_precio_esperado(datos["Precio Actual"], datos["Precio Esperado"]),
         ]
 
-        # Pesos de cada métrica
+        # Pesos
         pesos = [8.96, 14.93, 4.48, 13.43, 10.45, 10.45, 10.45, 2.99, 1.49, 4.48, 10.45, 7.46]
 
         # Puntuación Final
-        puntuacion_final = calcular_puntuacion(pesos, valores)
+        puntuacion_final = calcular_puntuacion_total(pesos, valores)
 
-        # Mostrar Resultados
+        # Mostrar resultados
         st.write(f"**Puntuación Final:** {puntuacion_final}")
         st.subheader("Datos Financieros:")
         for key, value in datos.items():
