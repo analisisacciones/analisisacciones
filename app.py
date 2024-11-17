@@ -1,7 +1,35 @@
 import yfinance as yf
 import streamlit as st
 
-# Funciones para calcular valores intermedios según las métricas
+# Función para calcular la puntuación total basada en redondeos intermedios
+def calcular_puntuacion_total(pesos, valores):
+    # Cálculo con redondeos intermedios (simulación de Excel)
+    resultados_parciales = [round(p * v / 100, 3) for p, v in zip(pesos, valores)]
+    suma_ponderada = round(sum(resultados_parciales), 2)  # Redondear la suma total
+    puntuacion_final = round(suma_ponderada / 10, 2)  # Escalar al rango 0-10
+    return puntuacion_final
+
+# Función para obtener datos de yfinance
+def obtener_datos(ticker_symbol):
+    ticker = yf.Ticker(ticker_symbol)
+    data = ticker.info
+    return {
+        "P/E Trailing": data.get("trailingPE", "N/A"),
+        "P/E Forward": data.get("forwardPE", "N/A"),
+        "Margen de Beneficio": data.get("profitMargins", "N/A"),
+        "Relación Empresa/EBITDA": data.get("enterpriseToEbitda", "N/A"),
+        "Insiders": data.get("heldPercentInsiders", "N/A"),
+        "Cash": data.get("totalCash", "N/A"),
+        "Deuda": data.get("totalDebt", "N/A"),
+        "EBITDA": data.get("ebitda", "N/A"),
+        "Crecimiento de Ganancias": data.get("earningsQuarterlyGrowth", "N/A"),
+        "Beta": data.get("beta", "N/A"),
+        "Dividendos": data.get("dividendYield", "N/A"),
+        "Precio Actual": data.get("currentPrice", "N/A"),
+        "Precio Esperado": data.get("targetMeanPrice", "N/A"),
+    }
+
+# Funciones de evaluación de métricas
 def calcular_pe_trailing(pe_trailing):
     if pe_trailing == "N/A":
         return 0
@@ -152,32 +180,6 @@ def calcular_precio_esperado(precio_actual, precio_esperado):
     else:
         return 100
 
-# Función para calcular la puntuación total con redondeos intermedios
-def calcular_puntuacion_total(pesos, valores):
-    resultados_parciales = [round(p * v / 100, 2) for p, v in zip(pesos, valores)]  # Redondeo intermedio
-    suma_ponderada = sum(resultados_parciales)
-    return round(suma_ponderada / 10, 2)
-
-# Función para obtener datos de yfinance
-def obtener_datos(ticker_symbol):
-    ticker = yf.Ticker(ticker_symbol)
-    data = ticker.info
-    return {
-        "P/E Trailing": data.get("trailingPE", "N/A"),
-        "P/E Forward": data.get("forwardPE", "N/A"),
-        "Margen de Beneficio": data.get("profitMargins", "N/A"),
-        "Relación Empresa/EBITDA": data.get("enterpriseToEbitda", "N/A"),
-        "Insiders": data.get("heldPercentInsiders", "N/A"),
-        "Cash": data.get("totalCash", "N/A"),
-        "Deuda": data.get("totalDebt", "N/A"),
-        "EBITDA": data.get("ebitda", "N/A"),
-        "Crecimiento de Ganancias": data.get("earningsQuarterlyGrowth", "N/A"),
-        "Beta": data.get("beta", "N/A"),
-        "Dividendos": data.get("dividendYield", "N/A"),
-        "Precio Actual": data.get("currentPrice", "N/A"),
-        "Precio Esperado": data.get("targetMeanPrice", "N/A"),
-    }
-
 # Streamlit - Interfaz principal
 def main():
     st.title("Análisis de Acciones")
@@ -185,7 +187,7 @@ def main():
     if ticker_symbol:
         datos = obtener_datos(ticker_symbol)
 
-        # Calcular valores
+        # Cálculo de valores
         valores = [
             calcular_pe_trailing(datos["P/E Trailing"]),
             calcular_pe_forward(datos["P/E Forward"]),
