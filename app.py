@@ -250,46 +250,11 @@ def main():
 
 
 
-def set_background():
-    css = """
-    <style>
-        .stApp {
-            background-image: url("https://i.imgur.com/r4IHxFJ.jpeg");
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-        }
-    </style>
-    """
-    st.markdown(css, unsafe_allow_html=True)
-
-set_background()
-
-
-
-import yfinance as yf
-import streamlit as st
-
-# Función para establecer el fondo
-def set_background():
-    css = """
-    <style>
-        .stApp {
-            background-image: url("https://i.imgur.com/r4IHxFJ.jpeg");
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-        }
-    </style>
-    """
-    st.markdown(css, unsafe_allow_html=True)
-
-set_background()  # Llamar a la función
 
 
 
 
-
+    
 
 
 
