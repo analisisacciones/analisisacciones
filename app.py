@@ -285,7 +285,7 @@ def main():
 
 
 
-    set_background(r"C:\Users\marco\OneDrive\Imágenes\fondo.jpg")
+    set_background(r"C:\Users\marco\OneDrive\Imágenes\133659648482843717.jpg")
 
 
 
