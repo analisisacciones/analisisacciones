@@ -5,11 +5,12 @@ import streamlit as st
 def set_background():
     css = """
     <style>
-        .stApp {
+        body {
             background-image: url("https://i.imgur.com/r4IHxFJ.jpeg");
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
+            height: 100vh;
         }
     </style>
     """
