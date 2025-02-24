@@ -1,26 +1,4 @@
 import yfinance as yf
-import streamlit as st
-
-# CSS para establecer la imagen de fondo
-def set_background(image_file):
-    with open(image_file, "rb") as f:
-        data = f.read()
-    b64_encoded = f"data:image/png;base64,{data.hex()}"  # Codifica la imagen en base64
-
-    css = f"""
-    <style>
-        .stApp {{
-            background: url({b64_encoded});
-            background-size: cover;
-        }}
-    </style>
-    """
-    st.markdown(css, unsafe_allow_html=True)
-
-# Llamar a la función con el nombre del archivo de la imagen
-set_background("C:\Users\marco\OneDrive\Escritorio\fondo")
-
-st.title("Análisis de Acciones")
 
 
 
