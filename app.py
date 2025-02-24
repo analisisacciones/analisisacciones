@@ -253,6 +253,25 @@ def main():
 
 
 
+# Función para establecer el fondo
+def set_background():
+    css = """
+    <style>
+        .stApp {
+            background-image: url("https://i.imgur.com/r4IHxFJ.jpeg");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+    </style>
+    """
+    st.markdown(css, unsafe_allow_html=True)
+
+# Llamada a la función para establecer el fondo al principio de main()
+set_background()
+
+
+
 
     
 
