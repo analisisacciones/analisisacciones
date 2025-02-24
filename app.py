@@ -249,26 +249,6 @@ def calcular_diferencia_precio(precio_actual, precio_esperado):
 # Streamlit
 def main():
 
-  
-    # Función para establecer el fondo
-def set_background():
-    css = """
-    <style>
-        body {
-            background-image: url("https://i.imgur.com/r4IHxFJ.jpeg");
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            height: 100vh;
-        }
-    </style>
-    """
-    st.markdown(css, unsafe_allow_html=True)
-
-# Llamar a la función antes de cualquier otro contenido
-set_background()
-
-
     st.title("Análisis de Acciones")
     ticker_symbol = st.text_input("Introduce el símbolo de la acción:")
 
