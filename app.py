@@ -1,6 +1,21 @@
 import yfinance as yf
 import streamlit as st
 
+
+# Código para establecer imagen de fondo
+def set_background(image_url):
+    st.markdown(
+        f"""
+        <style>
+        .stApp {{
+            background: url("{image_url}") no-repeat center center fixed;
+            background-size: cover;
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
   
 # Función para formatear números grandes
 def formatear_numero(numero):
