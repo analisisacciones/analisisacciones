@@ -1,6 +1,20 @@
 import yfinance as yf
 import streamlit as st
 
+    # Función para establecer el fondo
+def set_background():
+    css = """
+    <style>
+        .stApp {
+            background-image: url("https://i.imgur.com/r4IHxFJ.jpeg");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+    </style>
+    """
+    st.markdown(css, unsafe_allow_html=True)
+
 # Función para formatear números grandes
 def formatear_numero(numero):
     if numero == "N/A" or numero is None:
@@ -248,22 +262,7 @@ def calcular_diferencia_precio(precio_actual, precio_esperado):
 # Streamlit
 def main():
 
-    # Función para establecer el fondo
-def set_background():
-    css = """
-    <style>
-        .stApp {
-            background-image: url("https://i.imgur.com/r4IHxFJ.jpeg");
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-        }
-    </style>
-    """
-    st.markdown(css, unsafe_allow_html=True)
-
-# Llamada a la función para establecer el fondo al principio de main()
-set_background()
+  
 
 
     st.title("Análisis de Acciones")
