@@ -18,7 +18,7 @@ def set_background(image_file):
     st.markdown(css, unsafe_allow_html=True)
 
 # Llamar a la función con el nombre del archivo de la imagen
-set_background("C:\Users\marco\OneDrive\Escritorio\fondo.jpg")
+set_background("C:\Users\marco\OneDrive\Escritorio\fondo")
 
 st.title("Análisis de Acciones")
 
