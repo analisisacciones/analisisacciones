@@ -1,9 +1,58 @@
 import yfinance as yf
+import streamlit as st
+import base64
+import os
+
+# Función para establecer la imagen de fondo
+def set_background(image_path):
+    if not os.path.exists(image_path):
+        st.error(f"Error: No se encontró el archivo en la ruta {image_path}")
+        return
+    
+    with open(image_path, "rb") as f:
+        encoded_string = base64.b64encode(f.read()).decode()
+    
+    css = f"""
+    <style>
+        .stApp {{
+            background-image: url("data:image/jpg;base64,{encoded_string}");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }}
+    </style>
+    """
+    st.markdown(css, unsafe_allow_html=True)
+
+# Llamar a la función con la imagen de fondo
+set_background(r"C:\Users\marco\OneDrive\Imágenes\fondo.jpg")
+
+st.title("Análisis de Acciones")
+
+
+
+
+
+
+
+
+import yfinance as yf
 
 
 
 
 import streamlit as st
+
+
+
+
+
+set_background(r"C:\Users\marco\OneDrive\Imágenes\fondo.jpg")
+
+
+
+
+
 
 # Función para formatear números grandes
 def formatear_numero(numero):
@@ -251,6 +300,43 @@ def calcular_diferencia_precio(precio_actual, precio_esperado):
 
 # Streamlit
 def main():
+
+
+
+
+
+import base64
+import os
+
+# Función para establecer la imagen de fondo
+def set_background(image_path):
+    if not os.path.exists(image_path):
+        st.error(f"Error: No se encontró el archivo en la ruta {image_path}")
+        return
+    
+    with open(image_path, "rb") as f:
+        encoded_string = base64.b64encode(f.read()).decode()
+    
+    css = f"""
+    <style>
+        .stApp {{
+            background-image: url("data:image/jpg;base64,{encoded_string}");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }}
+    </style>
+    """
+    st.markdown(css, unsafe_allow_html=True)
+
+
+
+
+
+
+    
+
+    
     st.title("Análisis de Acciones")
     ticker_symbol = st.text_input("Introduce el símbolo de la acción:")
 
